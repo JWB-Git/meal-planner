@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+</head>
+
+<body>
+    <div id="app">
+        <!-- Nav -->
+        <nav class="navbar navbar-expand-sm navbar-light bg-light">
+            <span class="navbar-brand mb-0 h1">Meal Planner</span>
+
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbar">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item mr-4">
+                        <a id="profile" class="nav-link" href="profile.html" style="display: none">
+                            <img class="border rounded-circle" height="40px" :src="profileUrl" :alt="name" />
+                            <span class="d-md-none">Profile</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <div class="nav-link">
+                            <button id="login-button" v-on:click="login" class="btn btn-success" style="display: none"><i class="fas fa-sign-in-alt"></i>&nbsp;Login</button>
+                            <button id="logout-button" v-on:click="logout" class="btn btn-danger" style="display: none"><i class="fas fa-sign-in-alt"></i>&nbsp;Logout</button>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main -->
+        <main>
+            <div id="logged-in" class="container" style="display: none">
+                <div class="row">
+                    <div class="col">
+                        <p class="lead mt-2 text-center">Hello {{ name }}</p>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col">
+                        <div class="card">
+                            <div class="card-header text-center">Add to Calendar</div>
+                            <div class="card-body">
+                                <form v-on:submit.prevent>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">Date:&nbsp;</span>
+                                        </div>
+                                        <input type="date" class="form-control" v-model="newDate"/>
+                                    </div>
+
+                                    <div class="input-group mt-1">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">Food:&nbsp;</span>
+                                        </div>
+                                        <input type="text" class="form-control" v-model="newFood"/>
+                                    </div>
+
+                                    <button class="btn btn-primary btn-block mt-1" v-on:click="addToMenu">Submit</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-2">
+                    <div class="col">
+                        <div class="card">
+                            <div class="card-header text-center">Upcoming Meals</div>
+                            <div class="card-body">
+                                <ul class="list-unstyled" v-for="meal in menuObjects" :key="meal.id">
+                                    <li class="container-fluid">
+                                        <div class="row border rounded py-2">
+                                            <div class="col-lg-1 col-md-2 col-3 text-center">
+                                                <div class="border rounded py-2 bg-light">
+                                                    <div class="lead">{{ meal.date.toDate().getDate() }}</div>
+                                                    <div>{{ meal.date.toDate().toLocaleString("default", {month: "long"}) }}</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-10 col-md-18 col-6 my-auto">
+                                                <div class="mx-3">{{ meal.food }}</div>
+                                            </div>
+                                            <div class="col-lg-1 col-md-2 col-3 text-center my-auto">
+                                                <button class="btn btn-success my-1" v-on:click="setEditId(meal.id)" data-toggle="modal" data-target="#editModal"><i class="fas fa-pen"></i></button>
+                                                <button class="btn btn-danger my-1" v-on:click="deleteMeal(meal.id)"><i class="fas fa-trash-alt"></i></button>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="logged-out" class="container" style="display: none">
+                <p class="lead mt-2 text-center">You need to login!</p>
+            </div>
+        </main>
+
+        <!-- Modals -->
+        <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editModalLabel">Edit Entry: <span class="font-italic">{{ editId }}</span></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form v-on:submit.prevent>
+                        <div class="modal-body">
+                                <div class="input-group mt-1">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">Food:&nbsp;</span>
+                                    </div>
+                                    <input type="text" class="form-control" v-model="editFood"/>
+                                </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary" data-dismiss="modal" v-on:click="editMeal(editId)">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+<!-- Scripts -->
+    <!-- JQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.bundle.min.js" integrity="sha384-1CmrxMRARb6aLqgBO7yyAxTOQE2AKb9GfXnEo760AUcUmFx3ibVJJAzGytlQcNXd" crossorigin="anonymous"></script>
+
+    <!-- Font Awesome -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/js/all.min.js" integrity="sha512-M+hXwltZ3+0nFQJiVke7pqXY7VdtWW2jVG31zrml+eteTP7im25FdwtLhIBTWkaHRQyPrhO2uy8glLMHZzhFog==" crossorigin="anonymous"></script>
+
+    <!-- Firebase Core-->
+    <script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-app.js"></script>
+
+    <!-- Firebase Libraries -->
+    <script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-analytics.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.15.5/firebase-firestore.js"></script>
+
+    <!-- Firebase Config -->
+    <script src="firebase-config.js"></script>
+
+    <!-- Vue -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+    <!-- Main Vue Script -->
+    <script src="vue.js"></script>
+
+<!-- End Scripts -->
+
+</body>
+</html>
