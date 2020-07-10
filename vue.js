@@ -19,7 +19,15 @@ app = new Vue({
 
             //Edit Functionality
             editId: '',
-            editFood: ''
+            editFood: '',
+
+            //Recipe Array
+            recipeObjects: [],
+
+            //Add Recipe Vars
+            addRecipe: '',
+            addRecipeUrl: '',
+            addRecipeImage: ''
         }
     },
 
@@ -44,8 +52,6 @@ app = new Vue({
         },
 
         addToMenu: function (){
-            console.log(this.newDate);
-            console.log(this.newFood);
             if(this.newFood !== '' && this.newDate !== ''){
                 db.collection("calendar").add({
                     userEmail: this.email,
@@ -55,9 +61,7 @@ app = new Vue({
                     console.log("Document written with ID:", docRef.id);
                 }).catch(function(error){
                     console.error("Error adding document: ", error);
-                })
-
-                alert("Food successfully added to calendar");
+                });
 
                 this.newDate = '';
                 this.newFood = '';
@@ -120,6 +124,54 @@ app = new Vue({
 
             this.updateMenus();
         },
+
+        addToRecipes: function(){
+            if(this.addRecipe !== '' && this.addRecipeUrl !== '' && this.addRecipeImage !== ''){
+                db.collection("recipes").add({
+                    userEmail: this.email,
+                    recipe: this.addRecipe,
+                    recipeUrl: this.addRecipeUrl,
+                    recipeImage: this.addRecipeImage
+                }).then(function(docRef){
+                    console.log("Document written with ID:", docRef.id);
+                }).catch(function(error){
+                    console.error("Error adding document: ", error);
+                });
+
+                this.addRecipe = '';
+                this.addRecipeUrl = '';
+                this.addRecipeImage = '';
+
+                this.updateRecipes();
+            }
+            else{
+                alert("Please fill in the form fully");
+            }
+        },
+
+        updateRecipes: function(){
+            let userRecipes = [];
+
+            db.collection("recipes").where("userEmail", "==", this.email)
+                .get()
+                .then(querySnapshot => {
+                    querySnapshot.forEach(recipe => {
+                        userRecipes.push({id: recipe.id, ...recipe.data()})
+                    });
+                });
+
+            this.recipeObjects = userRecipes;
+        },
+
+        deleteRecipe: function(recipeId){
+            db.collection("recipes").doc(recipeId).delete().then(function(){
+                console.log("Document deleted with ID:", recipeId);
+            }).catch(function(error){
+                console.error("Error removing document:", error);
+            });
+
+            this.updateRecipes();
+        }
     },
 
     created: function(){
@@ -139,8 +191,9 @@ app = new Vue({
                     this.profileUrl = user.photoURL;
                     this.email = user.email;
 
-                    //Update Menu List and Update Today's Meal
+                    //Get Data from Database for menu and recipes
                     this.updateMenus();
+                    this.updateRecipes();
 
                 }
                 else{
