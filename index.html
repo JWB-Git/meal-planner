@@ -78,7 +78,7 @@
                                 <ul class="list-unstyled" v-for="meal in menuObjects" :key="meal.id">
                                     <li class="container-fluid">
                                         <div class="row border rounded py-2">
-                                            <div class="col-lg-1 col-md-2 col-3 text-center">
+                                            <div class="col-lg-1 col-md-2 col-3 text-center my-auto">
                                                 <div class="border rounded py-2 bg-light">
                                                     <div class="lead">{{ meal.date.toDate().getDate() }}</div>
                                                     <div>{{ meal.date.toDate().toLocaleString("default", {month: "long"}) }}</div>
@@ -96,6 +96,35 @@
                                 </ul>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="row mt-2">
+                    <div class="col">
+                        <h2 class="text-center">Recipe Inspiration</h2>
+                    </div>
+                </div>
+
+                <div class="row mt-3 text-center" >
+                    <div class=" col-md-6 col-lg-4" v-for="recipe in recipeObjects">
+                        <div class="card mb-3">
+                            <div class="card-header">{{ recipe.recipe }}</div>
+                            <div class="card-body">
+                                <div class="embed-responsive embed-responsive-16by9">
+                                    <img class="embed-responsive-item rounded" :src="recipe.recipeImage" :alt="recipe.recipe" />
+                                </div>
+                                <a class="btn btn-primary mt-2" :href="recipe.recipeUrl" target="_blank">View Recipe</a>
+                                <button class="btn btn-danger mt-2" v-on:click="deleteRecipe(recipe.id)"><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col">
+                        <button class="btn btn-primary btn-block" data-toggle="modal" data-target="#addRecipeModal">Add new recipe</button>
                     </div>
                 </div>
             </div>
@@ -128,6 +157,47 @@
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-primary" data-dismiss="modal" v-on:click="editMeal(editId)">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="addRecipeModal" tabindex="-1" role="dialog" aria-labelledby="addRecipeModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addRecipeModelLabel">Add Recipe: <span class="font-italic">{{ editId }}</span></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form v-on:submit.prevent>
+                        <div class="modal-body">
+                            <div class="input-group mt-1">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Recipe: </span>
+                                </div>
+                                <input type="text" class="form-control" v-model="addRecipe"/>
+                            </div>
+
+                            <div class="input-group mt-1">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Link:&nbsp;</span>
+                                </div>
+                                <input type="text" class="form-control" v-model="addRecipeUrl"/>
+                            </div>
+
+                            <div class="input-group mt-1">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Image URL:&nbsp;</span>
+                                </div>
+                                <input type="text" class="form-control" v-model="addRecipeImage"/>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary" data-dismiss="modal" v-on:click="addToRecipes()">Add</button>
                         </div>
                     </form>
                 </div>
